@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ระบบบันทึกกิจกรรมและจองห้อง · IMAG</title>
+  <meta name="description" content="ระบบบันทึกการเข้าร่วมกิจกรรมและจองห้อง หลักสูตร IMAG">
+  <meta name="theme-color" content="#3d2878">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/imag-icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/imag-icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="IMAG">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="IMAG">
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #272262; }
+    /* iOS standalone (black-translucent) วาดใต้แถบสถานะ/แถบโฮม — เว้นตาม safe area (env() ใช้ไม่ได้ใน iframe ข้างใน จึงต้องเว้นที่ชั้นนอก)
+       แถบบนเป็นสีม่วง (ตัวอักษรนาฬิกาสีขาว) แถบล่างเป็นสีขาวกลืนกับแถบเมนูล่างของแอป */
+    body { box-sizing: border-box; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: linear-gradient(#272262 0 50%, #ffffff 50% 100%); }
+    #app { display: block; width: 100%; height: 100vh; height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border: 0; margin: 0; background: #fff; }
+    #splash { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+      background: linear-gradient(140deg, #272262 0%, #3d2878 50%, #662d91 100%); color: #fff;
+      font: 15px/1.5 "Sarabun", "Noto Sans Thai", "Leelawadee UI", Tahoma, system-ui, sans-serif; text-align: center; transition: opacity .35s ease; }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash img { width: 96px; height: 96px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    #splash .t { font-weight: 700; font-size: 17px; letter-spacing: .2px; }
+    #splash .spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; animation: s 0.9s linear infinite; }
+    #splash .slow { display: none; max-width: 300px; font-size: 13.5px; opacity: .92; }
+    #splash.is-slow .slow { display: block; }
+    #splash a, noscript a { color: #fff; font-weight: 700; }
+    @keyframes s { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { #splash .spin { animation-duration: 3s; } #splash { transition: none; } }
+  </style>
+</head>
+<body>
+  <div id="splash" role="status" aria-live="polite">
+    <img src="icons/imag-icon-192.png" alt="IMAG" width="96" height="96">
+    <div class="t">ระบบบันทึกกิจกรรมและจองห้อง</div>
+    <div class="spin" aria-hidden="true"></div>
+    <div class="slow">ใช้เวลานานกว่าปกติ… หากหน้าไม่ขึ้น <a id="direct" href="#" target="_top" rel="noopener">เปิดระบบโดยตรง</a></div>
+    <noscript><div>เบราว์เซอร์ปิด JavaScript อยู่ — <a href="https://script.google.com/macros/s/AKfycbxvBfvSusz8wPH2sx9dsEMpoozTBckA-zfn17j0d6efpUnFVJzV_lm4Fk7LmRrszAGL/exec">เปิดระบบโดยตรง</a></div></noscript>
+  </div>
+  <iframe id="app" title="ระบบบันทึกกิจกรรมและจองห้อง IMAG"
+    allow="camera *; clipboard-read *; clipboard-write *; fullscreen *"
+    allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <script>
+  (function () {
+    // ลิงก์เว็บแอป Apps Script (ถ้า Deploy ใหม่เป็น URL อื่น ให้แก้บรรทัดนี้บรรทัดเดียว)
+    var APP_URL = 'https://script.google.com/macros/s/AKfycbxvBfvSusz8wPH2sx9dsEMpoozTBckA-zfn17j0d6efpUnFVJzV_lm4Fk7LmRrszAGL/exec';
+    // ส่งต่อ query string ทั้งหมด (เช่น ?a=<กิจกรรม>&c=<รหัส> จาก QR เช็คชื่อ) ไปยังเว็บแอป
+    var qs = location.search && location.search.length > 1 ? location.search : '';
+    var src = APP_URL + qs;
+    var frame = document.getElementById('app'), splash = document.getElementById('splash');
+    document.getElementById('direct').href = src;
+    var done = false;
+    function hide() { if (done) return; done = true; splash.classList.add('hide'); setTimeout(function () { splash.style.display = 'none'; }, 400); }
+    // load ของ iframe นอกสุดยิงเมื่อหน้า Google โหลดเสร็จ; หน้าแอปจริงอยู่ใน iframe ซ้อนอีกชั้น จึงหน่วงอีกเล็กน้อยให้แอปวาดเสร็จ
+    frame.addEventListener('load', function () { setTimeout(hide, 900); });
+    setTimeout(function () { if (!done) splash.classList.add('is-slow'); }, 12000);
+    frame.src = src;
+  })();
+  </script>
+</body>
+</html>

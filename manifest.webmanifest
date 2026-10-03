@@ -1,0 +1,19 @@
+{
+  "name": "IMAG ระบบบันทึกกิจกรรมและจองห้อง",
+  "short_name": "IMAG",
+  "description": "ระบบบันทึกการเข้าร่วมกิจกรรมและจองห้อง หลักสูตร IMAG",
+  "lang": "th",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#3d2878",
+  "background_color": "#272262",
+  "icons": [
+    { "src": "icons/imag-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/imag-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/imag-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
